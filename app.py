@@ -1,50 +1,72 @@
 import streamlit as st
 from transformers import pipeline
 
-# Cache the model loading function to avoid reloading it every time
-@st.cache_resource
-def load_model():
-    return pipeline("text2text-generation", model="google/byt5-small")
+# Set up the app title
+st.title("Career and Study Path Recommendations")
 
-# Load the model
-generator = load_model()
+# Introduction text for the user
+st.write(
+    """
+    This app helps you find personalized career and study path recommendations based on your profile.
+    Fill out the form below and click 'Get Recommendations' to receive tailored advice.
+    """
+)
 
-# Title of the app
-st.title("Your Study & Career Path Buddy")
+# User input form (keeping your original UI design)
+with st.form(key='user_input_form'):
+    # Collect user information
+    age = st.text_input("Age")
+    gender = st.text_input("Gender")
+    country = st.text_input("Country")
+    qualification = st.text_input("Highest Qualification")
+    academic_interest = st.radio("Academic Interest", ["STEM", "Humanities", "Arts", "Business", "Other"])
+    aspirations = st.selectbox("Do you want to work locally or internationally?", ["Locally", "Internationally", "Both"])
+    hobbies = st.text_area("Hobbies (e.g., music, sports, reading)")
+    skills = st.text_area("Skills (e.g., programming, communication, leadership)")
+    languages = st.text_area("Languages you speak")
 
-# Collect user inputs
-age = st.text_input("Age")
-gender = st.text_input("Gender")
-country = st.text_input("Country")
-qualification = st.text_input("Highest Qualification")
-academic_interest = st.radio("Academic Interest", ["STEM", "Humanities", "Arts", "Business", "Other"])
-aspirations = st.selectbox("Do you want to work locally or internationally?", ["Locally", "Internationally", "Both"])
-hobbies = st.text_area("Hobbies (e.g., music, sports, reading)")
-skills = st.text_area("Skills (e.g., programming, communication, leadership)")
-languages = st.text_area("Languages you speak")
+    # Submit button
+    submit_button = st.form_submit_button(label="Get Recommendations")
 
-# Create a structured prompt for the model based on user input
-if st.button("Get Career Recommendations"):
+# If the form is submitted, generate recommendations
+if submit_button:
+    # Display the user's profile summary
+    st.write("### Summary of Inputs")
+    st.write(f"**Age**: {age}")
+    st.write(f"**Gender**: {gender}")
+    st.write(f"**Country**: {country}")
+    st.write(f"**Highest Qualification**: {qualification}")
+    st.write(f"**Academic Interest**: {academic_interest}")
+    st.write(f"**Career Aspiration**: {aspirations}")
+    st.write(f"**Hobbies**: {hobbies}")
+    st.write(f"**Skills**: {skills}")
+    st.write(f"**Languages**: {languages}")
+
+    # Construct the prompt to send to the model
     prompt = f"""
     You are a career and education advisor. Suggest career and study paths for someone with the following profile:
-    - Age: {age}
-    - Gender: {gender}
-    - Country: {country}
-    - Highest Qualification: {qualification}
-    - Academic Interest: {academic_interest}
-    - Career Aspiration: {aspirations}
-    - Hobbies: {hobbies}
-    - Skills: {skills}
-    - Languages: {languages}
-
-    Provide a clear and concise response. Recommend suitable career or study paths, the required educational background, and potential career growth.
+    
+    Age: {age}
+    Gender: {gender}
+    Country: {country}
+    Highest Qualification: {qualification}
+    Academic Interest: {academic_interest}
+    Career Aspiration: {aspirations}
+    Hobbies: {hobbies}
+    Skills: {skills}
+    Languages: {languages}
+    
+    Provide a clear and concise response. Recommend suitable career or study paths, the required educational background, and potential career growth. 
     Do not include personal information or irrelevant details like timelines, deadlines, or additional conversation.
     """
 
-    # Generate the recommendation from GPT-2 model
-    result = generator(prompt, max_length=200, num_return_sequences=1)
-    recommendations = result[0]['generated_text']
+    # Load the google/byt5-small model using Hugging Face pipeline
+    pipe = pipeline("text2text-generation", model="google/byt5-small")
 
-    # Display the recommendations
-    st.write("### Career and Study Path Recommendations")
-    st.write(recommendations)
+    # Generate the response from the model
+    try:
+        result = pipe(prompt, max_length=150, num_return_sequences=1)
+        st.write("### Career and Study Path Recommendations")
+        st.write(result[0]['generated_text'])
+    except Exception as e:
+        st.error(f"Failed to get recommendations from the model. Error: {str(e)}")
