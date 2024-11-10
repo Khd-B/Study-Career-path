@@ -33,8 +33,8 @@ if st.button("Get Career Recommendations"):
     - Skills: {skills}
     - Languages: {languages}
 
-    Please provide only career or study path recommendations, educational requirements, and possible career growth.
-    Avoid including personal information such as emails or unnecessary details.
+    Provide a clear and concise response. Recommend suitable career or study paths, the required educational background, and potential career growth.
+    Do not include personal information or irrelevant details like timelines, deadlines, or additional conversation.
     """
 
     # Generate the recommendation from GPT-2 model
