@@ -1,4 +1,5 @@
 import streamlit as st
+import sentencepiece
 from transformers import T5Tokenizer, T5ForConditionalGeneration  # Corrected imports for ByT5
 
 # Load the T5 model and tokenizer using st.cache_resource
