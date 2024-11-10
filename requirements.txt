@@ -1,4 +1,4 @@
-torch>=1.9.0
-transformers
-sentencepiece
 streamlit
+transformers
+torch
+sentencepiece
