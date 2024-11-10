@@ -1,11 +1,11 @@
 import streamlit as st
-from transformers import ByT5Tokenizer, ByT5ForConditionalGeneration
+from transformers import T5Tokenizer, T5ForConditionalGeneration  # Corrected imports
 
-# Load the ByT5 model and tokenizer using st.cache_resource
+# Load the T5 model and tokenizer using st.cache_resource
 @st.cache_resource
 def load_model():
-    tokenizer = ByT5Tokenizer.from_pretrained("google/byt5-small")
-    model = ByT5ForConditionalGeneration.from_pretrained("google/byt5-small")
+    tokenizer = T5Tokenizer.from_pretrained("google/byt5-small")  # Corrected tokenizer
+    model = T5ForConditionalGeneration.from_pretrained("google/byt5-small")  # Corrected model
     return tokenizer, model
 
 tokenizer, model = load_model()
