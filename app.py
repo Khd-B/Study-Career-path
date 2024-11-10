@@ -1,11 +1,15 @@
 import streamlit as st
-from transformers import pipeline
+import requests
+from transformers import GPT2LMHeadModel, GPT2Tokenizer
 
 # Title of the app
 st.title("Your Study & Career Path Buddy")
 
 # Introduction
 st.write("Welcome! This app will help guide you in choosing your study and career path based on your background, skills, and preferences.")
+
+# Access Hugging Face token from Streamlit Secrets
+hf_token = st.secrets["huggingface_token"]
 
 # Initialize session state for form inputs if they do not exist
 if 'step' not in st.session_state:
@@ -36,7 +40,7 @@ def go_to_next_step():
 # Personal Information Section
 if st.session_state.step == 1:
     st.header("Personal Information")
-    with st.form(key=f'personal_info_form_{st.session_state.step}'):  # Unique key for this form
+    with st.form(key='personal_info_form'):
         col1, col2 = st.columns([1, 1])
 
         # Personal details in two columns (Age and Gender in one row)
@@ -63,7 +67,7 @@ if st.session_state.step == 1:
 # Interests Section
 if st.session_state.step == 2:
     st.header("Your Interests")
-    with st.form(key=f'interests_form_{st.session_state.step}'):  # Unique key for this form
+    with st.form(key='interests_form'):
         # Asking about academic interests
         st.session_state.academic_interest = st.radio(
             "Which academic field interests you the most?",
@@ -94,7 +98,7 @@ if st.session_state.step == 2:
 # Skills and Language Section
 if st.session_state.step == 3:
     st.header("Skills and Languages")
-    with st.form(key=f'skills_form_{st.session_state.step}'):  # Unique key for this form
+    with st.form(key='skills_form'):
         # Asking about skills and languages
         st.session_state.skills = st.text_area("Skills (e.g., programming, communication, leadership)", st.session_state.skills)
         st.session_state.languages = st.text_area("Languages you speak", st.session_state.languages)
@@ -121,28 +125,10 @@ if st.session_state.step == 4:
     st.write(f"**Skills**: {st.session_state.skills}")
     st.write(f"**Languages**: {st.session_state.languages}")
 
-    # Initialize the Hugging Face GPT-2 model for text generation
-    model_name = "openai-community/gpt2"  # Model name on Hugging Face
-    generator = pipeline("text-generation", model=model_name)
-
-    # Create a prompt using the user's inputs
-    prompt = f"Suggest career and study paths for someone with the following profile:\n" \
-             f"Age: {st.session_state.age}\n" \
-             f"Gender: {st.session_state.gender}\n" \
-             f"Country: {st.session_state.country}\n" \
-             f"Qualification: {st.session_state.qualification}\n" \
-             f"Academic Interest: {st.session_state.academic_interest}\n" \
-             f"Career Aspiration: {st.session_state.aspirations}\n" \
-             f"Hobbies: {st.session_state.hobbies}\n" \
-             f"Skills: {st.session_state.skills}\n" \
-             f"Languages: {st.session_state.languages}"
-
-    # Generate recommendations based on the prompt
-    recommendations = generator(prompt, max_length=300, num_return_sequences=1)
-
-    # Display the generated recommendations
+    # Placeholder for AI-generated response (can be replaced with actual recommendation logic)
     st.write("### Career and Study Path Recommendations")
-    st.write(recommendations[0]['generated_text'])
+    st.write(f"Recommended Study Paths: Based on your interest in {st.session_state.academic_interest} and skills.")
+    st.write(f"Potential Career Options: Considering your aspiration to work {st.session_state.aspirations}.")
 
     # Provide a button to restart the app
     restart_button = st.button("Restart")
@@ -157,3 +143,37 @@ if st.session_state.step == 4:
         st.session_state.hobbies = ""
         st.session_state.skills = ""
         st.session_state.languages = ""
+
+    # Now, call the Hugging Face model to get recommendations based on user input
+    if st.button("Get Career Recommendations"):
+        user_data = {
+            "age": st.session_state.age,
+            "gender": st.session_state.gender,
+            "country": st.session_state.country,
+            "qualification": st.session_state.qualification,
+            "academic_interest": st.session_state.academic_interest,
+            "aspirations": st.session_state.aspirations,
+            "hobbies": st.session_state.hobbies,
+            "skills": st.session_state.skills,
+            "languages": st.session_state.languages
+        }
+
+        headers = {
+            "Authorization": f"Bearer {hf_token}"
+        }
+
+        # You can call Hugging Face's Inference API or any model endpoint you prefer here
+        response = requests.post(
+            "https://api-inference.huggingface.co/models/openai/gpt2",
+            headers=headers,
+            json={"inputs": str(user_data)}
+        )
+
+        # Check for valid response and display it
+        if response.status_code == 200:
+            recommendations = response.json()  # assuming the API returns recommendations
+            st.write("### Career Recommendations")
+            st.write(recommendations)
+        else:
+            st.error("Failed to get recommendations from the model. Please try again.")
+
