@@ -42,9 +42,9 @@ if submit_button:
     st.write(f"**Skills**: {skills}")
     st.write(f"**Languages**: {languages}")
 
-    # Construct the prompt to send to the model
+    # Construct a more detailed prompt to send to the model
     prompt = f"""
-    You are a career and education advisor. Suggest career and study paths for someone with the following profile:
+    You are a career advisor. Based on the following profile, recommend specific career paths or study paths:
     
     Age: {age}
     Gender: {gender}
@@ -56,8 +56,7 @@ if submit_button:
     Skills: {skills}
     Languages: {languages}
     
-    Provide a clear and concise response. Recommend suitable career or study paths, the required educational background, and potential career growth. 
-    Do not include personal information or irrelevant details like timelines, deadlines, or additional conversation.
+    Please provide detailed career and study recommendations. Include suggestions for relevant degrees, certifications, job roles, and possible career growth. Focus on practical and realistic advice.
     """
 
     # Load the google/byt5-small model using Hugging Face pipeline
@@ -65,7 +64,7 @@ if submit_button:
 
     # Generate the response from the model
     try:
-        result = pipe(prompt, max_length=150, num_return_sequences=1)
+        result = pipe(prompt, max_length=200, num_return_sequences=1)
         st.write("### Career and Study Path Recommendations")
         st.write(result[0]['generated_text'])
     except Exception as e:
