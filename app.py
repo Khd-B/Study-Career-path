@@ -1,17 +1,19 @@
 import streamlit as st
-import sentencepiece
-from transformers import T5Tokenizer, T5ForConditionalGeneration  # Corrected imports for ByT5
+from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM
 
-# Load the T5 model and tokenizer using st.cache_resource
+# Load the model and tokenizer using st.cache_resource
 @st.cache_resource
 def load_model():
-    tokenizer = T5Tokenizer.from_pretrained("google/byt5-small")  # Corrected tokenizer
-    model = T5ForConditionalGeneration.from_pretrained("google/byt5-small")  # Corrected model
+    tokenizer = AutoTokenizer.from_pretrained("facebook/m2m100_418M")
+    model = AutoModelForSeq2SeqLM.from_pretrained("facebook/m2m100_418M")
     return tokenizer, model
 
 tokenizer, model = load_model()
 
-# Function to generate career recommendations
+# Create a translation pipeline using the model
+pipe = pipeline("translation", model=model, tokenizer=tokenizer)
+
+# Function to generate career recommendations based on user data
 def generate_career_recommendations(user_data):
     prompt = (
         f"User Profile:\n"
@@ -24,13 +26,13 @@ def generate_career_recommendations(user_data):
         f"Hobbies: {user_data['hobbies']}\n"
         f"Skills: {user_data['skills']}\n"
         f"Languages: {user_data['languages']}\n\n"
-        "Generate academic and career advice based on the above profile."
+        "Translate this user profile into career and academic advice."
     )
 
-    inputs = tokenizer(prompt, return_tensors="pt")
-    outputs = model.generate(**inputs, max_length=300)
+    # Use the model to generate a translation (career advice or recommendations)
+    output = pipe(prompt, max_length=300)
 
-    recommendations = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    recommendations = output[0]['translation_text']
     return recommendations
 
 # Streamlit UI
