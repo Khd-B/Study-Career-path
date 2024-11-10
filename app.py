@@ -9,7 +9,7 @@ st.title("Your Study & Career Path Buddy")
 st.write("Welcome! This app will help guide you in choosing your study and career path based on your background, skills, and preferences.")
 
 # Access Hugging Face token from Streamlit Secrets
-hf_token = st.secrets["huggingface_token"]
+hf_token = st.secrets["hf"]["token"]
 
 # Initialize session state for form inputs if they do not exist
 if 'step' not in st.session_state:
@@ -176,4 +176,3 @@ if st.session_state.step == 4:
             st.write(recommendations)
         else:
             st.error("Failed to get recommendations from the model. Please try again.")
-
