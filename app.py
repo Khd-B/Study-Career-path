@@ -23,12 +23,11 @@ def generate_career_recommendations(user_data):
         f"Hobbies: {user_data['hobbies']}\n"
         f"Skills: {user_data['skills']}\n"
         f"Languages: {user_data['languages']}\n\n"
-        
         "Generate academic and career advice based on the above profile."
     )
 
     inputs = tokenizer(prompt, return_tensors="pt")
-    outputs = model.generate(**inputs, max_length=300) 
+    outputs = model.generate(**inputs, max_length=300)
 
     recommendations = tokenizer.decode(outputs[0], skip_special_tokens=True)
     return recommendations
@@ -47,8 +46,8 @@ if 'user_data' not in st.session_state:
         'gender': '',
         'country': '',
         'qualification': '',
-        'academic_interest': 'STEM', 
-        'aspirations': 'Locally',    
+        'academic_interest': 'STEM',
+        'aspirations': 'Locally',
         'hobbies': '',
         'skills': '',
         'languages': ''
@@ -72,11 +71,30 @@ if st.session_state.step == 2:
         st.session_state.user_data['academic_interest'] = st.radio(
             "Which academic field interests you the most?",
             options=["STEM", "Humanities", "Arts", "Business"],
-            index=["STEM", "Humanities", "Arts", "Business"].index(st.session_state.user_data['academic_interest']) 
+            index=["STEM", "Humanities", "Arts", "Business"].index(st.session_state.user_data['academic_interest'])
         )
         st.session_state.user_data['aspirations'] = st.selectbox(
             "Do you want to work locally or internationally?",
             options=["Locally", "Internationally", "Both"],
             index=["Locally", "Internationally", "Both"].index(st.session_state.user_data['aspirations'])
         )
-        st.session_state.user_data['hobbies'] = st.text_area("Hobbies", st.session_state.
+        st.session_state.user_data['hobbies'] = st.text_area("Hobbies", st.session_state.user_data['hobbies'])
+        st.session_state.user_data['skills'] = st.text_area("Skills", st.session_state.user_data['skills'])
+        st.session_state.user_data['languages'] = st.text_area("Languages", st.session_state.user_data['languages'])
+        
+        if st.form_submit_button("Next: Get Recommendations"):
+            st.session_state.step = 3
+
+# Step 3: Display Recommendations
+if st.session_state.step == 3:
+    st.header("Career and Study Path Recommendations")
+    
+    # Generate recommendations based on user data
+    recommendations = generate_career_recommendations(st.session_state.user_data)
+    
+    # Display recommendations
+    st.write(recommendations)
+
+    # Option to reset the form
+    if st.button("Start Over"):
+        st.session_state.step = 1
