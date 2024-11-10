@@ -79,6 +79,4 @@ if st.session_state.step == 2:
             options=["Locally", "Internationally", "Both"],
             index=["Locally", "Internationally", "Both"].index(st.session_state.user_data['aspirations'])
         )
-        st.session_state.user_data['hobbies'] = st.text_area("Hobbies", st.session_state.user_data['hobbies'])
-        if st.form_submit_button("Next: Skills & Languages"):
-            st.
+        st.session_state.user_data['hobbies'] = st.text_area("Hobbies", st.session_state.
