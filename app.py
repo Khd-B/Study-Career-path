@@ -135,18 +135,25 @@ if st.session_state.step == 4:
     }
 
     # Create a button to get recommendations
-    if st.button("Get Career Recommendations"):
-        try:
-            response = requests.post(flask_api_url, json=user_data)
-            if response.status_code == 200:
-                # Display the response from Flask API (career recommendations)
-                recommendations = response.json()  # assuming the Flask API returns JSON data
-                st.write("### Career Recommendations")
-                st.write(recommendations["recommendations"])
-            else:
-                st.error("Failed to get recommendations from the API")
-        except Exception as e:
-            st.error(f"Error occurred while calling API: {e}")
+if st.button("Get Career Recommendations"):
+    try:
+        response = requests.post(flask_api_url, json=user_data)
+        
+        # If the response status code is 200 (OK), process the recommendation data
+        if response.status_code == 200:
+            recommendations = response.json()  # assuming the Flask API returns JSON data
+            st.write("### Career Recommendations")
+            st.write(recommendations["recommendations"])
+        
+        # If the response code is not 200, show the status code and the response text
+        else:
+            st.error(f"Failed to get recommendations from the API. Status code: {response.status_code}")
+            st.error(f"API Response: {response.text}")
+
+    except Exception as e:
+        # Handle any other exceptions and display the error
+        st.error(f"Error occurred while calling API: {e}")
+
 
     # Provide a button to restart the app
     restart_button = st.button("Restart")
