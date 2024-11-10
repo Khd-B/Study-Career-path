@@ -1,8 +1,13 @@
 import streamlit as st
 from transformers import pipeline
 
-# Load the Hugging Face pipeline for text generation (GPT-2 model)
-generator = pipeline("text-generation", model="gpt2")
+# Cache the model loading function to avoid reloading it every time
+@st.cache_resource
+def load_model():
+    return pipeline("text-generation", model="distilgpt2")
+
+# Load the model
+generator = load_model()
 
 # Title of the app
 st.title("Your Study & Career Path Buddy")
@@ -18,9 +23,8 @@ hobbies = st.text_area("Hobbies (e.g., music, sports, reading)")
 skills = st.text_area("Skills (e.g., programming, communication, leadership)")
 languages = st.text_area("Languages you speak")
 
-# Combine the user's input into a structured prompt for the model
+# Create a structured prompt for the model based on user input
 if st.button("Get Career Recommendations"):
-    # Create a more structured and clear prompt for the model
     prompt = f"""
     You are a career and education advisor. Suggest career and study paths for someone with the following profile:
     - Age: {age}
