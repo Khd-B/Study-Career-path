@@ -20,18 +20,21 @@ languages = st.text_area("Languages you speak")
 
 # Combine the user's input into a structured prompt for the model
 if st.button("Get Career Recommendations"):
-    # Prepare the prompt for the GPT-2 model
+    # Create a more structured and clear prompt for the model
     prompt = f"""
-    Suggest career and study paths for someone with the following profile:
-    Age: {age}
-    Gender: {gender}
-    Country: {country}
-    Qualification: {qualification}
-    Academic Interest: {academic_interest}
-    Career Aspiration: {aspirations}
-    Hobbies: {hobbies}
-    Skills: {skills}
-    Languages: {languages}
+    You are a career and education advisor. Suggest career and study paths for someone with the following profile:
+    - Age: {age}
+    - Gender: {gender}
+    - Country: {country}
+    - Highest Qualification: {qualification}
+    - Academic Interest: {academic_interest}
+    - Career Aspiration: {aspirations}
+    - Hobbies: {hobbies}
+    - Skills: {skills}
+    - Languages: {languages}
+
+    Please provide only career or study path recommendations, educational requirements, and possible career growth.
+    Avoid including personal information such as emails or unnecessary details.
     """
 
     # Generate the recommendation from GPT-2 model
