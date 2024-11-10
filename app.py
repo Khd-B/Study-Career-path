@@ -43,28 +43,34 @@ if submit_button:
     st.write(f"**Languages**: {languages}")
 
     # Construct a more detailed prompt to send to the model
-    prompt = f"""
-    You are a career advisor. Based on the following profile, recommend specific career paths or study paths:
-    
-    Age: {age}
-    Gender: {gender}
-    Country: {country}
-    Highest Qualification: {qualification}
-    Academic Interest: {academic_interest}
-    Career Aspiration: {aspirations}
-    Hobbies: {hobbies}
-    Skills: {skills}
-    Languages: {languages}
-    
-    Please provide detailed career and study recommendations. Include suggestions for relevant degrees, certifications, job roles, and possible career growth. Focus on practical and realistic advice.
-    """
+    def generate_career_recommendations(user_data):
+       prompt = (
+           f"User Profile:\n"
+           f"Age: {user_data['age']}\n"
+           f"Gender: {user_data['gender']}\n"
+           f"Country: {user_data['country']}\n"
+           f"Qualification: {user_data['qualification']}\n"
+           f"Academic Interest: {user_data['academic_interest']}\n"
+           f"Career Aspiration: {user_data['aspirations']}\n"
+           f"Hobbies: {user_data['hobbies']}\n"
+           f"Skills: {user_data['skills']}\n"
+           f"Languages: {user_data['languages']}\n\n"
+           
+           "Generate academic and career advice based on the above profile. " # Instruction
+       )
 
+       inputs = tokenizer(prompt, return_tensors="pt")
+       outputs = model.generate(**inputs, max_length=300) # Adjust max_length
+
+       recommendations = tokenizer.decode(outputs[0], skip_special_tokens=True)
+       return recommendations
+    
     # Load the google/byt5-small model using Hugging Face pipeline
     pipe = pipeline("text2text-generation", model="google/byt5-small")
 
     # Generate the response from the model
     try:
-        result = pipe(prompt, max_length=200, num_return_sequences=1)
+        result = pipe(prompt, max_length=300, num_return_sequences=1)
         st.write("### Career and Study Path Recommendations")
         st.write(result[0]['generated_text'])
     except Exception as e:
