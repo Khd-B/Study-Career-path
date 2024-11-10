@@ -1,4 +1,5 @@
 import streamlit as st
+import requests
 
 # Title of the app
 st.title("Your Study & Career Path Buddy")
@@ -105,7 +106,7 @@ if st.session_state.step == 3:
     if submit_button_3:
         st.session_state.step = 4
 
-# Final Recommendations Section
+# Final Recommendations Section (API Integration)
 if st.session_state.step == 4:
     st.header("Summary of the Inputs")
 
@@ -120,10 +121,32 @@ if st.session_state.step == 4:
     st.write(f"**Skills**: {st.session_state.skills}")
     st.write(f"**Languages**: {st.session_state.languages}")
 
-    # Placeholder for AI-generated response (can be replaced with actual recommendation logic)
-    st.write("### Career and Study Path Recommendations")
-    st.write(f"Recommended Study Paths: Based on your interest in {st.session_state.academic_interest} and skills.")
-    st.write(f"Potential Career Options: Considering your aspiration to work {st.session_state.aspirations}.")
+    # Flask API URL (replace with your cloud Flask API URL)
+    flask_api_url = "https://d24e-34-71-130-23.ngrok-free.app/get_recommendations"  # Replace this with your actual URL
+
+    # Prepare data to send to Flask API
+    user_data = {
+        "age": st.session_state.age,
+        "gender": st.session_state.gender,
+        "country": st.session_state.country,
+        "qualification": st.session_state.qualification,
+        "academic_interest": st.session_state.academic_interest,
+        "aspirations": st.session_state.aspirations
+    }
+
+    # Create a button to get recommendations
+    if st.button("Get Career Recommendations"):
+        try:
+            response = requests.post(flask_api_url, json=user_data)
+            if response.status_code == 200:
+                # Display the response from Flask API (career recommendations)
+                recommendations = response.json()  # assuming the Flask API returns JSON data
+                st.write("### Career Recommendations")
+                st.write(recommendations["recommendations"])
+            else:
+                st.error("Failed to get recommendations from the API")
+        except Exception as e:
+            st.error(f"Error occurred while calling API: {e}")
 
     # Provide a button to restart the app
     restart_button = st.button("Restart")
@@ -138,44 +161,3 @@ if st.session_state.step == 4:
         st.session_state.hobbies = ""
         st.session_state.skills = ""
         st.session_state.languages = ""
-import streamlit as st
-import requests
-
-# Title of the app
-st.title("Your Study & Career Path Buddy")
-
-# Collect user inputs
-age = st.text_input("Age")
-gender = st.text_input("Gender")
-country = st.text_input("Country")
-qualification = st.text_input("Highest Qualification")
-academic_interest = st.radio("Academic Interest", ["STEM", "Humanities", "Arts", "Business"])
-aspirations = st.selectbox("Do you want to work locally or internationally?", ["Locally", "Internationally", "Both"])
-
-# Flask API URL (update with the actual ngrok URL)
-flask_api_url = "https://your-ngrok-url/get_recommendations"  # Replace this with your actual ngrok URL
-
-# Create a button to get recommendations
-if st.button("Get Career Recommendations"):
-    # Prepare data to send to Flask API
-    user_data = {
-        "age": age,
-        "gender": gender,
-        "country": country,
-        "qualification": qualification,
-        "academic_interest": academic_interest,
-        "aspirations": aspirations
-    }
-
-    # Send the data to Flask API and get recommendations
-    try:
-        response = requests.post("https://d24e-34-71-130-23.ngrok-free.app/get_recommendations", json=user_data)
-        if response.status_code == 200:
-            # Display the response from Flask API (career recommendations)
-            recommendations = response.json()  # assuming the Flask API returns JSON data
-            st.write("### Career Recommendations")
-            st.write(recommendations["recommendations"])
-        else:
-            st.error("Failed to get recommendations from the API")
-    except Exception as e:
-        st.error(f"Error occurred while calling API: {e}")
